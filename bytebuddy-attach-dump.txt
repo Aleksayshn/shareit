@@ -1,0 +1,18 @@
+java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:119)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at net.bytebuddy.agent.Attacher.install(Attacher.java:106)
+	at net.bytebuddy.agent.Attacher.main(Attacher.java:64)
+Caused by: com.sun.tools.attach.AgentLoadException: Agent JAR not found or no Agent-Class attribute
+	at jdk.attach/sun.tools.attach.HotSpotVirtualMachine.loadAgent(HotSpotVirtualMachine.java:180)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	... 3 more
+java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:119)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at net.bytebuddy.agent.Attacher.install(Attacher.java:106)
+	at net.bytebuddy.agent.Attacher.main(Attacher.java:64)
+Caused by: com.sun.tools.attach.AgentLoadException: Agent JAR not found or no Agent-Class attribute
+	at jdk.attach/sun.tools.attach.HotSpotVirtualMachine.loadAgent(HotSpotVirtualMachine.java:180)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	... 3 more
