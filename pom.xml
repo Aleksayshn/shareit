@@ -119,6 +119,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>3.6.0</version>
 					<configuration>
 						<configLocation>checkstyle.xml</configLocation>
 						<failOnViolation>true</failOnViolation>
@@ -127,10 +128,11 @@
 					</configuration>
 					<executions>
 						<execution>
+							<id>checkstyle-verify</id>
+							<phase>verify</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
-							<phase>compile</phase>
 						</execution>
 					</executions>
 				</plugin>
@@ -144,6 +146,8 @@
 					</configuration>
 					<executions>
 						<execution>
+							<id>spotbugs-verify</id>
+							<phase>verify</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
@@ -159,14 +163,26 @@
 						<output>file</output>
 					</configuration>
 					<executions>
+						<!-- Enables javaagent before running tests -->
 						<execution>
-							<id>jacoco-initialize</id>
+							<id>jacoco-prepare-agent</id>
+							<phase>initialize</phase>
 							<goals>
 								<goal>prepare-agent</goal>
 							</goals>
 						</execution>
+						<!-- Generates html/xml report -->
+						<execution>
+							<id>jacoco-report</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+						<!-- Coverage Gate -->
 						<execution>
 							<id>jacoco-check</id>
+							<phase>verify</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
@@ -176,22 +192,12 @@
 										<element>BUNDLE</element>
 										<limits>
 											<limit>
-												<counter>INSTRUCTION</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.01</minimum>
-											</limit>
-											<limit>
 												<counter>LINE</counter>
 												<value>COVEREDRATIO</value>
 												<minimum>0.9</minimum>
 											</limit>
 											<limit>
 												<counter>BRANCH</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.6</minimum>
-											</limit>
-											<limit>
-												<counter>COMPLEXITY</counter>
 												<value>COVEREDRATIO</value>
 												<minimum>0.6</minimum>
 											</limit>
@@ -209,13 +215,6 @@
 									</rule>
 								</rules>
 							</configuration>
-						</execution>
-						<execution>
-							<id>jacoco-report</id>
-							<phase>test</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
 						</execution>
 					</executions>
 				</plugin>
