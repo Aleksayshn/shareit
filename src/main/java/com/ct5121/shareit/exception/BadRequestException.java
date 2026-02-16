@@ -1,0 +1,7 @@
+package com.ct5121.shareit.exception;
+
+public class BadRequestException extends RuntimeException {
+    public BadRequestException(String message) {
+        super(message);
+    }
+}
