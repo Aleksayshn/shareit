@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemResponesDto addItem(Long userId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
         Item item = itemMapper.toItem(itemRequestDto);
         item.setOwner(user);
         return itemMapper.toItemRespones(itemRepository.save(item));
@@ -52,13 +52,13 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemResponesDto updateItem(Long userId, Long itemId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
 
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
+                .orElseThrow(() -> new NotFoundException("Item with ID " + itemId + " not found"));
 
         if (!item.getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Пользователь не является владельцем вещи");
+            throw new NotFoundException("The user is not the owner of the item");
         }
         if (itemRequestDto.getName() != null) {
             item.setName(itemRequestDto.getName());
@@ -75,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponesDto getItem(Long userId, Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+                .orElseThrow(() -> new NotFoundException("Item not found"));
 
         ItemResponesDto dto = itemMapper.toItemRespones(item);
         dto.setComments(commentRepository.findByItemIdOrderByCreatedDesc(itemId).stream()

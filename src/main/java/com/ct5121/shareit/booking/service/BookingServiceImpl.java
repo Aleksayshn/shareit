@@ -34,22 +34,22 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto createBooking(Long userId, BookingRequestDto bookingRequestDto) {
         User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+                .orElseThrow(() -> new NotFoundException("Item not found"));
         if (!item.isAvailable()) {
-            throw new BadRequestException("Вещь недоступна для бронирования");
+            throw new BadRequestException("The item is not available for reservation.");
         }
         if (item.getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Владелец не может бронировать свою вещь");
+            throw new NotFoundException("The owner cannot reserve his item.");
         }
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd()) ||
                 bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())) {
-            throw new BadRequestException("Некорректные даты бронирования");
+            throw new BadRequestException("Incorrect booking dates");
         }
         if (!bookingRepository.findOverlappingBookings(item.getId(),
                 bookingRequestDto.getStart(), bookingRequestDto.getEnd()).isEmpty()) {
-            throw new BadRequestException("Вещь уже забронирована на указанные даты");
+            throw new BadRequestException("The item is already booked for the specified dates");
         }
         Booking booking = new Booking();
         booking.setStart(bookingRequestDto.getStart());
@@ -65,13 +65,13 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto approveBooking(Long userId, Long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
+                .orElseThrow(() -> new NotFoundException("Reservations not found"));
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
-            throw new ForbiddenException("Пользователь не является владельцем вещи");
+            throw new ForbiddenException("The user is not the owner of the item");
         }
         if (booking.getStatus() != Booking.BookingStatus.WAITING) {
-            throw new ForbiddenException("Бронирование уже обработано");
+            throw new ForbiddenException("The reservation has already been processed.");
         }
         booking.setStatus(approved ? Booking.BookingStatus.APPROVED : Booking.BookingStatus.REJECTED);
         return bookingMapper.toBookingResponseDto(bookingRepository.save(booking));
@@ -80,10 +80,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto getBooking(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
+                .orElseThrow(() -> new NotFoundException("Reservations not found"));
         if (!booking.getBooker().getId().equals(userId) &&
                 !booking.getItem().getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Пользователь не имеет доступа к бронированию");
+            throw new NotFoundException("The user does not have access to the reservation");
         }
         return bookingMapper.toBookingResponseDto(booking);
     }
@@ -91,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getUserBookings(Long userId, String state, int from, int size) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Пользователь не найден");
+            throw new NotFoundException("User not found");
         }
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
@@ -126,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getOwnerBookings(Long userId, String state, int from, int size) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Пользователь не найден");
+            throw new NotFoundException("User not found");
         }
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
