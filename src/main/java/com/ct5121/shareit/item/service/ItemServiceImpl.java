@@ -1,4 +1,4 @@
-package com.ct5121.shareit.item.service.impl;
+package com.ct5121.shareit.item.service;
 
 import com.ct5121.shareit.booking.mapper.BookingMapper;
 import com.ct5121.shareit.booking.model.Booking;
@@ -15,7 +15,6 @@ import com.ct5121.shareit.item.model.Comment;
 import com.ct5121.shareit.item.model.Item;
 import com.ct5121.shareit.item.repository.CommentRepository;
 import com.ct5121.shareit.item.repository.ItemRepository;
-import com.ct5121.shareit.item.service.ItemService;
 import com.ct5121.shareit.user.model.User;
 import com.ct5121.shareit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

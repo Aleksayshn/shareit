@@ -1,44 +1,62 @@
 package com.ct5121.shareit.config;
 
-import com.ct5121.shareit.item.model.Item;
-import com.ct5121.shareit.item.repository.ItemRepository;
-import com.ct5121.shareit.user.model.User;
-import com.ct5121.shareit.user.repository.UserRepository;
+import com.ct5121.shareit.booking.dto.BookingRequestDto;
+import com.ct5121.shareit.booking.dto.BookingResponseDto;
+import com.ct5121.shareit.booking.service.BookingService;
+import com.ct5121.shareit.item.dto.ItemRequestDto;
+import com.ct5121.shareit.item.dto.ItemResponesDto;
+import com.ct5121.shareit.item.service.ItemService;
+import com.ct5121.shareit.user.dto.UserRequestDto;
+import com.ct5121.shareit.user.dto.UserResponesDto;
+import com.ct5121.shareit.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDateTime;
+
 @Configuration
 @RequiredArgsConstructor
 public class DataInitializer {
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
+    private final UserService userService;
+    private final ItemService itemService;
+    private final BookingService bookingService;
 
- @Bean
- CommandLineRunner initData() {
-     return args -> {
-         itemRepository.deleteAll();
-         userRepository.deleteAll();
+    @Bean
+    CommandLineRunner initData() {
+        return args -> {
+            String suffix = String.valueOf(System.currentTimeMillis());
 
-         User u1 = new User();
-         u1.setName("Alex");
-         u1.setEmail("alex@test.com");
+            UserRequestDto ownerRequest = new UserRequestDto();
+            ownerRequest.setName("Alex");
+            ownerRequest.setEmail("alex+" + suffix + "@test.com");
 
-         User u2 = new User();
-         u2.setName("Mary");
-         u2.setEmail("mary@test.com");
+            UserRequestDto bookerRequest = new UserRequestDto();
+            bookerRequest.setName("Mary");
+            bookerRequest.setEmail("mary+" + suffix + "@test.com");
 
-         u1 = userRepository.save(u1);
-         u2 = userRepository.save(u2);
+            UserResponesDto owner = userService.addUser(ownerRequest);
+            UserResponesDto booker = userService.addUser(bookerRequest);
 
-         Item i1 = new Item(null, "Drill", "Power drill", true, u1, null);
-         Item i2 = new Item(null, "Bike", "Mountain bike", true, u1, 100L);
-         Item i3 = new Item(null, "Camera", "DSLR", false, u2, null);
+            ItemResponesDto item = itemService.addItem(
+                    owner.getId(),
+                    new ItemRequestDto("Drill", "Power drill", true)
+            );
 
-         itemRepository.save(i1);
-         itemRepository.save(i2);
-         itemRepository.save(i3);
-     };
- }
+            BookingRequestDto bookingRequest = new BookingRequestDto();
+            bookingRequest.setItemId(item.getId());
+            bookingRequest.setStart(LocalDateTime.now().plusDays(1));
+            bookingRequest.setEnd(LocalDateTime.now().plusDays(2));
+
+            BookingResponseDto created = bookingService.createBooking(booker.getId(), bookingRequest);
+            BookingResponseDto approved = bookingService.approveBooking(owner.getId(), created.getId(), true);
+            BookingResponseDto fetched = bookingService.getBooking(booker.getId(), approved.getId());
+
+            System.out.println("Demo completed:");
+            System.out.println("Owner ID = " + owner.getId() + ", Booker ID = " + booker.getId());
+            System.out.println("Item ID = " + item.getId());
+            System.out.println("Booking ID = " + fetched.getId() + ", Status = " + fetched.getStatus());
+        };
+    }
 }

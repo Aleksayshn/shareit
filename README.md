@@ -1,47 +1,107 @@
-# java-shareit
-Template repository for Shareit project.
+# ShareIt
 
-## SOLID Principles in This Project
+Spring Boot training project that demonstrates a layered architecture with:
+- JPA repositories (data access)
+- Service interfaces + implementations (application logic)
+- DTO validation + business checks
+- Startup `run` demo that executes service methods end-to-end
 
-This project applies SOLID mostly at the data/domain boundary level and through Spring abstractions.
+## What Was Implemented For The Task
 
-| Principle | Where it is applied | How it is applied |
-|---|---|---|
-| Single Responsibility Principle (SRP) | `com.ct5121.shareit.user.model.User`, `com.ct5121.shareit.item.model.Item`, `com.ct5121.shareit.user.repository.UserRepository`, `com.ct5121.shareit.item.repository.ItemRepository`, `com.ct5121.shareit.config.DataInitializer` | Each class/interface has one core reason to change: entities describe persistence state, repositories declare data access contracts, initializer seeds data at startup. |
-| Open/Closed Principle (OCP) | `UserRepository`, `ItemRepository` | Repositories are open for extension through new query methods (`findBy...`, custom `@Query`) without modifying Spring Data infrastructure. |
-| Liskov Substitution Principle (LSP) | `UserRepository extends JpaRepository<User, Long>`, `ItemRepository extends JpaRepository<Item, Long>` | Repository instances can be used via `JpaRepository` contracts, and Spring-generated implementations remain substitutable for the declared interfaces. |
-| Interface Segregation Principle (ISP) | `UserRepository`, `ItemRepository` | Repository interfaces expose focused methods needed by their aggregate (`User` vs `Item`) rather than one large generic DAO. |
-| Dependency Inversion Principle (DIP) | `DataInitializer` constructor injection of `UserRepository` and `ItemRepository` | The configuration class depends on repository abstractions (interfaces), while Spring injects concrete implementations at runtime. |
+### 1) Service interfaces and implementations (mirroring repositories)
 
-Notes:
-- The current codebase does not yet have a dedicated service/use-case layer, so business rules are minimal and close to persistence.
-- A stricter SOLID application for growing features would typically introduce service interfaces and separate DTO/mapping layers.
+Implemented service contracts and concrete classes for each main domain:
 
-## Clean Architecture Mapping
+- Users:
+  - `src/main/java/com/ct5121/shareit/user/service/UserService.java`
+  - `src/main/java/com/ct5121/shareit/user/service/UserServiceImpl.java`
+- Items:
+  - `src/main/java/com/ct5121/shareit/item/service/ItemService.java`
+  - `src/main/java/com/ct5121/shareit/item/service/ItemServiceImpl.java`
+- Bookings:
+  - `src/main/java/com/ct5121/shareit/booking/service/BookingService.java`
+  - `src/main/java/com/ct5121/shareit/booking/service/BookingServiceImpl.java`
 
-The current implementation is close to a simplified layered architecture. The table below maps each component to the nearest Clean Architecture role.
+Repositories remain Spring Data interfaces (generated implementations at runtime):
+- `src/main/java/com/ct5121/shareit/user/repository/UserRepository.java`
+- `src/main/java/com/ct5121/shareit/item/repository/ItemRepository.java`
+- `src/main/java/com/ct5121/shareit/item/repository/CommentRepository.java`
+- `src/main/java/com/ct5121/shareit/booking/repository/BookingRepository.java`
 
-| Code component | Layer (Clean Architecture) | Role |
-|---|---|---|
-| `src/main/java/com/ct5121/shareit/ShareItApp.java` | Frameworks and Drivers | Spring Boot entry point and runtime bootstrap. |
-| `src/main/java/com/ct5121/shareit/config/DataInitializer.java` | Interface Adapters / Framework glue | Startup adapter that populates data using repository ports. |
-| `src/main/java/com/ct5121/shareit/user/model/User.java` | Entities (Domain) | Core domain entity persisted as `users`. |
-| `src/main/java/com/ct5121/shareit/item/model/Item.java` | Entities (Domain) | Core domain entity persisted as `items` with owner relation. |
-| `src/main/java/com/ct5121/shareit/user/repository/UserRepository.java` | Interface Adapters (Repository Port + Adapter via Spring Data) | Declares user persistence operations and query contracts. |
-| `src/main/java/com/ct5121/shareit/item/repository/ItemRepository.java` | Interface Adapters (Repository Port + Adapter via Spring Data) | Declares item persistence operations and search/query contracts. |
-| `src/main/resources/schema.sql` | Frameworks and Drivers (Database) | Relational schema for persistence layer. |
-| `src/main/resources/application.properties` | Frameworks and Drivers (Configuration) | Runtime infrastructure configuration. |
-| `src/main/resources/application-test.properties` | Frameworks and Drivers (Test configuration) | Test runtime configuration. |
-| `src/test/java/com/ct5121/shareit/ShareItTests.java` | Tests (cross-layer verification) | Integration/smoke validation of application context behavior. |
+### 2) Validation and business logic
 
-### Dependency Direction (Current)
+Validation is implemented at two levels:
 
-- Domain entities (`user.model`, `item.model`) are used by repository contracts and infrastructure.
-- Repository interfaces are consumed by configuration/bootstrap (`DataInitializer`) through dependency injection.
-- Spring Boot and JPA infrastructure provide concrete implementations and runtime wiring.
+- DTO validation (`jakarta.validation`), for example:
+  - `src/main/java/com/ct5121/shareit/user/dto/UserRequestDto.java`
+  - `src/main/java/com/ct5121/shareit/item/dto/ItemRequestDto.java`
+  - `src/main/java/com/ct5121/shareit/booking/dto/BookingRequestDto.java`
+- Service-level business rules, for example:
+  - unique user email check
+  - only owner can update item
+  - booking dates must be valid (`start < end`)
+  - owner cannot book own item
+  - only owner can approve/reject booking
+  - overlapping booking prevention
+  - comment allowed only after approved past booking
 
-### Future Clean Architecture Alignment 
+### 3) Running service methods in application `run` flow
 
-1. Add `usecase/service` layer for application rules.
-2. Introduce explicit repository ports in the application core and keep Spring Data adapters in infrastructure.
-3. Add controller/API layer with DTOs and mappers to isolate transport from domain entities.
+Startup demo is implemented with `CommandLineRunner` in:
+
+- `src/main/java/com/ct5121/shareit/config/DataInitializer.java`
+
+On app start it:
+
+1. Creates two users via `UserService`
+2. Creates an item via `ItemService`
+3. Creates booking via `BookingService`
+4. Approves booking via `BookingService`
+5. Reads booking and prints final state
+
+This demonstrates that service wiring, validation, and business flow work together.
+
+## How To Run
+
+Prerequisites:
+- JDK 25
+- Maven 3.9+
+
+### Option A: Run tests (in-memory H2 already configured for tests)
+
+```bash
+mvn test
+```
+
+Test H2 config is in:
+- `src/test/resources/application.properties`
+
+### Option B: Run the application with in-memory DB (H2)
+
+Default `src/main/resources/application.properties` points to PostgreSQL.
+If you want to run the app without PostgreSQL, start it with runtime overrides:
+
+```bash
+mvn spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:h2:mem:shareit;DB_CLOSE_DELAY=-1 --spring.datasource.driver-class-name=org.h2.Driver --spring.datasource.username=sa --spring.datasource.password= --spring.jpa.hibernate.ddl-auto=none --spring.sql.init.mode=always --spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
+```
+
+Schema is loaded from:
+- `src/main/resources/schema.sql`
+
+## Expected Demo Output
+
+When the app starts successfully, console output from `DataInitializer` should include lines similar to:
+
+- `Demo completed:`
+- `Owner ID = ... , Booker ID = ...`
+- `Item ID = ...`
+- `Booking ID = ... , Status = APPROVED`
+
+## Build
+
+Compile only:
+
+```bash
+mvn -DskipTests compile
+```
+

@@ -1,4 +1,4 @@
-package com.ct5121.shareit.user.service.impl;
+package com.ct5121.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,6 @@ import com.ct5121.shareit.user.dto.UserUpdateDto;
 import com.ct5121.shareit.user.mapper.UserMapper;
 import com.ct5121.shareit.user.model.User;
 import com.ct5121.shareit.user.repository.UserRepository;
-import com.ct5121.shareit.user.service.UserService;
 
 import java.util.List;
 

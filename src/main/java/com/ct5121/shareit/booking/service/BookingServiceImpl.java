@@ -1,11 +1,10 @@
-package com.ct5121.shareit.booking.service.impl;
+package com.ct5121.shareit.booking.service;
 
 import com.ct5121.shareit.booking.dto.BookingRequestDto;
 import com.ct5121.shareit.booking.dto.BookingResponseDto;
 import com.ct5121.shareit.booking.mapper.BookingMapper;
 import com.ct5121.shareit.booking.model.Booking;
 import com.ct5121.shareit.booking.repository.BookingRepository;
-import com.ct5121.shareit.booking.service.BookingService;
 import com.ct5121.shareit.exception.BadRequestException;
 import com.ct5121.shareit.exception.ForbiddenException;
 import com.ct5121.shareit.exception.NotFoundException;
