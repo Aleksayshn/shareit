@@ -105,3 +105,21 @@ Compile only:
 mvn -DskipTests compile
 ```
 
+## Swagger / OpenAPI
+
+Swagger support is enabled via:
+- Dependency in `pom.xml`: `org.springdoc:springdoc-openapi-starter-webmvc-ui`
+- OpenAPI metadata config:
+  - `src/main/java/com/ct5121/shareit/config/SwaggerConfig.java`
+- Endpoint-level annotations in controllers:
+  - `@Tag` for grouping endpoints
+  - `@Operation` for endpoint summary/description
+  - `@Parameter` for path/header/query/body params
+  - `@ApiResponse` for response descriptions
+
+After starting the application, open:
+- Swagger UI (all endpoints listed): `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON spec: `http://localhost:8080/v3/api-docs`
+
+If you run on a different port, replace `8080` in the URLs.
+
