@@ -1,10 +1,10 @@
 package com.ct5121.shareit.item.mapper;
 
+import com.ct5121.shareit.item.dto.ItemRequestDto;
+import com.ct5121.shareit.item.dto.ItemResponseDto;
+import com.ct5121.shareit.item.model.Item;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import com.ct5121.shareit.item.dto.ItemRequestDto;
-import com.ct5121.shareit.item.dto.ItemResponesDto;
-import com.ct5121.shareit.item.model.Item;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
@@ -17,5 +17,5 @@ public interface ItemMapper {
     @Mapping(target = "lastBooking", ignore = true)
     @Mapping(target = "nextBooking", ignore = true)
     @Mapping(target = "comments", ignore = true)
-    ItemResponesDto toItemRespones(Item item);
+    ItemResponseDto toItemResponse(Item item);
 }

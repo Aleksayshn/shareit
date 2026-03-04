@@ -1,7 +1,7 @@
 package com.ct5121.shareit.user.mapper;
 
 import com.ct5121.shareit.user.dto.UserRequestDto;
-import com.ct5121.shareit.user.dto.UserResponesDto;
+import com.ct5121.shareit.user.dto.UserResponseDto;
 import com.ct5121.shareit.user.model.User;
 import org.mapstruct.Mapper;
 
@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     User toUser(UserRequestDto user);
 
-    UserResponesDto toUserResponesDto(User user);
+    UserResponseDto toUserResponseDto(User user);
 }

@@ -1,15 +1,16 @@
 package com.ct5121.shareit.user.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.ct5121.shareit.exception.BadRequestException;
 import com.ct5121.shareit.exception.NotFoundException;
 import com.ct5121.shareit.user.dto.UserRequestDto;
-import com.ct5121.shareit.user.dto.UserResponesDto;
+import com.ct5121.shareit.user.dto.UserResponseDto;
 import com.ct5121.shareit.user.dto.UserUpdateDto;
 import com.ct5121.shareit.user.mapper.UserMapper;
 import com.ct5121.shareit.user.model.User;
 import com.ct5121.shareit.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,51 +23,56 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponesDto addUser(UserRequestDto user) {
+    public UserResponseDto addUser(UserRequestDto user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists.");
+            throw new BadRequestException("User with email " + user.getEmail() + " already exists");
         }
         User newUser = userMapper.toUser(user);
-        return userMapper.toUserResponesDto(userRepository.save(newUser));
+        return userMapper.toUserResponseDto(userRepository.save(newUser));
     }
 
     @Override
-    public List<UserResponesDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(userMapper::toUserResponesDto)
+                .map(userMapper::toUserResponseDto)
                 .toList();
     }
 
     @Override
-    public UserResponesDto getUserById(Long id) {
-        return userMapper.toUserResponesDto(userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with email " + id + " not found")));
+    public UserResponseDto getUserById(Long id) {
+        return userMapper.toUserResponseDto(getExistingUser(id));
     }
 
     @Override
     @Transactional
-    public UserResponesDto updateUser(Long id, UserUpdateDto userUpdateDto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with email " + id + " not found"));
+    public UserResponseDto updateUser(Long id, UserUpdateDto userUpdateDto) {
+        User user = getExistingUser(id);
+
         if (userUpdateDto.getName() != null) {
             user.setName(userUpdateDto.getName());
         }
+
         if (userUpdateDto.getEmail() != null) {
-            if (!userUpdateDto.getEmail().equals(user.getEmail()) &&
-                    userRepository.existsByEmail(userUpdateDto.getEmail())) {
-                throw new IllegalArgumentException("User with email " + userUpdateDto.getEmail() + " already exists.");
+            if (userRepository.existsByEmailAndIdNot(userUpdateDto.getEmail(), id)) {
+                throw new BadRequestException("User with email " + userUpdateDto.getEmail() + " already exists");
             }
             user.setEmail(userUpdateDto.getEmail());
         }
-        return userMapper.toUserResponesDto(userRepository.save(user));
+
+        return userMapper.toUserResponseDto(userRepository.save(user));
     }
 
     @Override
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User with email " + id + " not found");
+            throw new NotFoundException("User with id " + id + " not found");
         }
         userRepository.deleteById(id);
+    }
+
+    private User getExistingUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
     }
 }
