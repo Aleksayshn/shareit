@@ -1,5 +1,10 @@
 package com.ct5121.shareit.item.controller;
 
+import com.ct5121.shareit.item.dto.CommentDto;
+import com.ct5121.shareit.item.dto.CommentResponseDto;
+import com.ct5121.shareit.item.dto.ItemRequestDto;
+import com.ct5121.shareit.item.dto.ItemResponseDto;
+import com.ct5121.shareit.item.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,63 +14,45 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.ct5121.shareit.item.dto.CommentDto;
-import com.ct5121.shareit.item.dto.CommentResponseDto;
-import com.ct5121.shareit.item.dto.ItemRequestDto;
-import com.ct5121.shareit.item.dto.ItemResponesDto;
-import com.ct5121.shareit.item.service.ItemService;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Item Management", description = "API for working with items for rent")
 public class ItemController {
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final ItemService itemService;
 
     @PostMapping
-    @Operation(
-            summary = "Add a new item",
-            description = "Creates a new item available for rent by other users",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Item successfully added"
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid item data"
-                    )
-            })
-    public ResponseEntity<ItemResponesDto> addItem(
-            @RequestHeader("X-Sharer-User-Id")
+    @Operation(summary = "Add a new item", description = "Creates a new item")
+    public ResponseEntity<ItemResponseDto> addItem(
+            @RequestHeader(USER_ID_HEADER)
             @Parameter(description = "ID of the item owner", required = true, example = "1")
             Long userId,
-            @Valid
-            @RequestBody
+            @Valid @RequestBody
             @Parameter(description = "Data of the new item", required = true)
             ItemRequestDto itemDto) {
         return ResponseEntity.ok(itemService.addItem(userId, itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    @Operation(
-            summary = "Update an item",
-            description = "Updates the data of an existing item. Only the owner can update the item",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Item successfully updated"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Item not found or user is not the owner"
-                    )
-            })
-    public ResponseEntity<ItemResponesDto> updateItem(
-            @RequestHeader("X-Sharer-User-Id")
+    @Operation(summary = "Update an item", description = "Only owner can update item")
+    public ResponseEntity<ItemResponseDto> updateItem(
+            @RequestHeader(USER_ID_HEADER)
             @Parameter(description = "ID of the item owner", required = true, example = "1")
             Long userId,
             @PathVariable
@@ -78,21 +65,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    @Operation(
-            summary = "Get item by ID",
-            description = "Returns full information about an item by its ID",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Item information"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Item not found"
-                    )
-            })
-    public ResponseEntity<ItemResponesDto> getItem(
-            @RequestHeader("X-Sharer-User-Id")
+    @Operation(summary = "Get item by ID", description = "Returns item details by ID")
+    public ResponseEntity<ItemResponseDto> getItem(
+            @RequestHeader(USER_ID_HEADER)
             @Parameter(description = "User ID", required = true, example = "1")
             Long userId,
             @PathVariable
@@ -102,33 +77,17 @@ public class ItemController {
     }
 
     @GetMapping
-    @Operation(
-            summary = "Get all items of a user",
-            description = "Returns a list of all items belonging to a specified user",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List of user's items"
-                    )
-            })
-    public ResponseEntity<List<ItemResponesDto>> getUserItems(
-            @RequestHeader("X-Sharer-User-Id")
+    @Operation(summary = "Get user items", description = "Returns all items belonging to user")
+    public ResponseEntity<List<ItemResponseDto>> getUserItems(
+            @RequestHeader(USER_ID_HEADER)
             @Parameter(description = "User ID", required = true, example = "1")
             Long userId) {
         return ResponseEntity.ok(itemService.getUserItems(userId));
     }
 
     @GetMapping("/search")
-    @Operation(
-            summary = "Search items",
-            description = "Searches for items available for rent by name or description",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List of found items"
-                    )
-            })
-    public ResponseEntity<List<ItemResponesDto>> searchItems(
+    @Operation(summary = "Search items", description = "Searches available items by text")
+    public ResponseEntity<List<ItemResponseDto>> searchItems(
             @RequestParam
             @Parameter(description = "Text to search", required = true, example = "drill")
             String text,
@@ -144,34 +103,20 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    @Operation(
-            summary = "Add a comment to an item",
-            description = "Adds a comment to an item. Only a user who rented the item can leave a comment",
+    @Operation(summary = "Add comment", description = "Only users with completed booking can comment",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Comment successfully added"
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "User has not rented the item"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Item or user not found"
-                    )
+                    @ApiResponse(responseCode = "200", description = "Comment added"),
+                    @ApiResponse(responseCode = "400", description = "Business rule violated")
             })
-
     public ResponseEntity<CommentResponseDto> addComment(
-            @RequestHeader("X-Sharer-User-Id")
+            @RequestHeader(USER_ID_HEADER)
             @Parameter(description = "User ID")
             Long userId,
             @PathVariable
             @Parameter(description = "Item ID")
             Long itemId,
-            @Valid
-            @RequestBody
-            @Parameter(description = "Comment data")
+            @Valid @RequestBody
+            @Parameter(description = "Comment payload")
             CommentDto commentDto) {
         return ResponseEntity.ok(itemService.addComment(userId, itemId, commentDto));
     }

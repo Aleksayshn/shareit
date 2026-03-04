@@ -1,26 +1,31 @@
 package com.ct5121.shareit.user.controller;
 
+import com.ct5121.shareit.user.dto.UserRequestDto;
+import com.ct5121.shareit.user.dto.UserResponseDto;
+import com.ct5121.shareit.user.dto.UserUpdateDto;
+import com.ct5121.shareit.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import com.ct5121.shareit.user.dto.UserRequestDto;
-import com.ct5121.shareit.user.dto.UserResponesDto;
-import com.ct5121.shareit.user.dto.UserUpdateDto;
-import com.ct5121.shareit.user.service.UserService;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@Tag(name = "User Management",
-        description = "API for working with users of the rental service")
+@Tag(name = "User Management", description = "API for working with users of the rental service")
 public class UserController {
-
     private final UserService userService;
 
     @PostMapping
@@ -30,32 +35,22 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "User created"),
                     @ApiResponse(responseCode = "400", description = "Invalid user data")
             })
-    public UserResponesDto addUser(
-            @Valid
-            @RequestBody
+    public UserResponseDto addUser(
+            @Valid @RequestBody
             @Parameter(description = "Data of the new user", required = true)
-            final UserRequestDto user) {
+            UserRequestDto user) {
         return userService.addUser(user);
     }
 
     @GetMapping
-    @Operation(summary = "Get all users",
-            description = "Returns a list of all registered users",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "List of users")
-            })
-    public List<UserResponesDto> getAllUsers() {
+    @Operation(summary = "Get all users", description = "Returns a list of all registered users")
+    public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{userId}")
-    @Operation(summary = "Get user by ID",
-            description = "Returns information about a user by their ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "User information"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
-            })
-    public UserResponesDto getUser(
+    @Operation(summary = "Get user by ID", description = "Returns information about a user by ID")
+    public UserResponseDto getUser(
             @PathVariable
             @Parameter(description = "User ID", required = true, example = "1")
             Long userId) {
@@ -63,31 +58,19 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    @Operation(summary = "Update user data",
-            description = "Updates information of an existing user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "User data updated"),
-                    @ApiResponse(responseCode = "400", description = "Invalid update data"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
-            })
-    public UserResponesDto updateUser(
+    @Operation(summary = "Update user data", description = "Updates existing user information")
+    public UserResponseDto updateUser(
             @PathVariable
             @Parameter(description = "User ID to update", required = true, example = "1")
             Long userId,
-            @Valid
-            @RequestBody
+            @Valid @RequestBody
             @Parameter(description = "Updated user data", required = true)
-            final UserUpdateDto user) {
+            UserUpdateDto user) {
         return userService.updateUser(userId, user);
     }
 
     @DeleteMapping("/{userId}")
-    @Operation(summary = "Delete user",
-            description = "Deletes a user from the system by their ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "User deleted"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
-            })
+    @Operation(summary = "Delete user", description = "Deletes a user by ID")
     public void deleteUser(
             @PathVariable
             @Parameter(description = "User ID to delete", required = true, example = "1")
