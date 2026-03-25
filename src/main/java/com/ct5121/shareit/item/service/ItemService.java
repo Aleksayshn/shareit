@@ -1,7 +1,7 @@
 package com.ct5121.shareit.item.service;
 
-import com.ct5121.shareit.item.dto.CommentDto;
-import com.ct5121.shareit.item.dto.CommentResponseDto;
+import com.ct5121.shareit.comment.dto.CommentDto;
+import com.ct5121.shareit.comment.dto.CommentResponseDto;
 import com.ct5121.shareit.item.dto.ItemRequestDto;
 import com.ct5121.shareit.item.dto.ItemResponseDto;
 

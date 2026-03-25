@@ -1,0 +1,61 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shareit
+    username: o.tiankina
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      platform: postgres
+  jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mvc:
+    problemdetails:
+      enabled: false
+
+logging:
+  level:
+    org.springframework.orm.jpa: INFO
+    org.springframework.transaction: INFO
+    org.springframework.transaction.interceptor: TRACE
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.jdbc.datasource.init: DEBUG
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-please-change-me-please-change-me-please-1234567890}
+      expiration: PT24H
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+        - http://localhost:8080
+      allowed-methods:
+        - GET
+        - POST
+        - PATCH
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - Authorization
+        - Content-Type
+        - Accept
+      exposed-headers:
+        - Authorization

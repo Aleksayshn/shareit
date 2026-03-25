@@ -1,5 +1,6 @@
-package com.ct5121.shareit.item.model;
+package com.ct5121.shareit.comment.model;
 
+import com.ct5121.shareit.item.model.Item;
 import com.ct5121.shareit.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,7 +45,6 @@ public class Comment {
     @Column(nullable = false)
     private LocalDateTime created;
 
-    // Entity identity is database-generated; avoid equality by mutable business fields.
     @Override
     public final boolean equals(Object o) {
         if (this == o) {
@@ -62,4 +62,3 @@ public class Comment {
         return Hibernate.getClass(this).hashCode();
     }
 }
-

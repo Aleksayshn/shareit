@@ -1,4 +1,4 @@
-package com.ct5121.shareit.item.dto;
+package com.ct5121.shareit.comment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
