@@ -1,4 +1,4 @@
-package com.ct5121.shareit.user.dto;
+package com.ct5121.shareit.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class UserRequestDto {
+public class RegisterRequest {
     @NotBlank(message = "Username cannot be empty")
     private String name;
 

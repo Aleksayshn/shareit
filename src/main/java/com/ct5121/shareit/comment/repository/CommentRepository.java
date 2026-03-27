@@ -1,6 +1,6 @@
-package com.ct5121.shareit.item.repository;
+package com.ct5121.shareit.comment.repository;
 
-import com.ct5121.shareit.item.model.Comment;
+import com.ct5121.shareit.comment.model.Comment;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

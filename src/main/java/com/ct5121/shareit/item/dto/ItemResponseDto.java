@@ -1,6 +1,7 @@
 package com.ct5121.shareit.item.dto;
 
 import com.ct5121.shareit.booking.dto.BookingResponseDto;
+import com.ct5121.shareit.comment.dto.CommentResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

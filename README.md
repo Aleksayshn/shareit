@@ -4,7 +4,19 @@ Spring Boot training project that demonstrates a layered architecture with:
 - JPA repositories (data access)
 - Service interfaces + implementations (application logic)
 - DTO validation + business checks
-- Startup `run` demo that executes service methods end-to-end
+- JWT-based authentication and stateless Spring Security
+- Swagger/OpenAPI documentation
+
+## Features
+
+- User registration, login, and current-user lookup via `/auth/register`, `/auth/login`, and `/auth/me`
+- Secure Bearer-token authentication with JWT and BCrypt password hashing
+- User management with validation and duplicate-email protection
+- Item management with owner-only updates and public text search
+- Booking flow with approval/rejection, state filters, and overlap checks
+- Comments allowed only for users with completed approved bookings
+- OpenAPI/Swagger UI for exploring and testing the REST API
+- Startup demo profile for running a simple end-to-end business flow
 
 ## What Was Implemented For The Task
 
@@ -78,7 +90,7 @@ Test H2 config is in:
 
 ### Option B: Run the application with in-memory DB (H2)
 
-Default `src/main/resources/application.properties` points to PostgreSQL.
+Default `src/main/resources/application.yml` points to PostgreSQL.
 If you want to run the app without PostgreSQL, start it with runtime overrides:
 
 ```bash
@@ -118,7 +130,7 @@ Swagger support is enabled via:
   - `@ApiResponse` for response descriptions
 
 After starting the application, open:
-- Swagger UI (all endpoints listed): `http://localhost:8080/swagger-ui/index.html`
+- Swagger UI (all endpoints listed): `http://localhost:8080/swagger`
 - OpenAPI JSON spec: `http://localhost:8080/v3/api-docs`
 
 If you run on a different port, replace `8080` in the URLs.

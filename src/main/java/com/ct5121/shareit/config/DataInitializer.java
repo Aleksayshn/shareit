@@ -36,10 +36,12 @@ public class DataInitializer {
             UserRequestDto ownerRequest = new UserRequestDto();
             ownerRequest.setName("Alex");
             ownerRequest.setEmail("alex+" + suffix + "@test.com");
+            ownerRequest.setPassword("password123");
 
             UserRequestDto bookerRequest = new UserRequestDto();
             bookerRequest.setName("Mary");
             bookerRequest.setEmail("mary+" + suffix + "@test.com");
+            bookerRequest.setPassword("password123");
 
             UserResponseDto owner = userService.addUser(ownerRequest);
             UserResponseDto booker = userService.addUser(bookerRequest);
