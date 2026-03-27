@@ -1,2 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-com.ct5121.shareit.config.RenderDatabaseUrlEnvironmentPostProcessor
