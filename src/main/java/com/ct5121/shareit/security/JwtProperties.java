@@ -2,6 +2,7 @@ package com.ct5121.shareit.security;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,6 +16,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "app.security.jwt")
 public class JwtProperties {
     @NotBlank
+    @Size(min = 32, message = "JWT secret must be at least 32 characters long")
     private String secret;
 
     @NotNull

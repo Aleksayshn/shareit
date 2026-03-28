@@ -27,6 +27,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class, CorsProperties.class})
 public class SecurityConfig {
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/error",
+            "/auth/register",
+            "/auth/login",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/actuator/health",
+            "/actuator/health/**",
+            "/actuator/info"
+    };
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ShareItUserDetailsService userDetailsService;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
@@ -38,6 +51,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -45,24 +60,13 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
-                                "/error",
-                                "/auth/register",
-                                "/auth/login",
-                                "/swagger",
-                                "/swagger/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/items/search").permitAll()
                         .requestMatchers(
                                 "/items",
                                 "/items/**",
                                 "/bookings",
                                 "/bookings/**",
-                                "/comments",
-                                "/comments/**",
                                 "/users",
                                 "/users/**")
                         .authenticated()
