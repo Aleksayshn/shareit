@@ -4,19 +4,7 @@ Spring Boot training project that demonstrates a layered architecture with:
 - JPA repositories (data access)
 - Service interfaces + implementations (application logic)
 - DTO validation + business checks
-- JWT-based authentication and stateless Spring Security
-- Swagger/OpenAPI documentation
-
-## Features
-
-- User registration, login, and current-user lookup via `/auth/register`, `/auth/login`, and `/auth/me`
-- Secure Bearer-token authentication with JWT and BCrypt password hashing
-- User management with validation and duplicate-email protection
-- Item management with owner-only updates and public text search
-- Booking flow with approval/rejection, state filters, and overlap checks
-- Comments allowed only for users with completed approved bookings
-- OpenAPI/Swagger UI for exploring and testing the REST API
-- Startup demo profile for running a simple end-to-end business flow
+- Startup `run` demo that executes service methods end-to-end
 
 ## What Was Implemented For The Task
 
@@ -73,32 +61,65 @@ On app start it:
 
 This demonstrates that service wiring, validation, and business flow work together.
 
+## Profiles
+
+- `local` (default): local PostgreSQL + `schema.sql`
+- `demo`: same bootstrap as `local`, plus demo seed data
+- `prod`: Docker/Render profile, PostgreSQL only, no schema auto-init
+- `test`: H2 in-memory profile for automated tests
+
 ## How To Run
 
 Prerequisites:
 - JDK 25
 - Maven 3.9+
 
-### Option A: Run tests (in-memory H2 already configured for tests)
+### Option A: Run tests
 
 ```bash
 mvn test
 ```
 
-Test H2 config is in:
-- `src/test/resources/application.properties`
+Test config is in:
+- `src/test/resources/application-test.properties`
 
-### Option B: Run the application with in-memory DB (H2)
+### Option B: Run the application locally with PostgreSQL
 
-Default `src/main/resources/application.yml` points to PostgreSQL.
-If you want to run the app without PostgreSQL, start it with runtime overrides:
+The default profile is `local`, so `mvn spring-boot:run` uses PostgreSQL on
+`localhost:5432/shareit` unless you override the datasource environment variables.
 
 ```bash
-mvn spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:h2:mem:shareit;DB_CLOSE_DELAY=-1 --spring.datasource.driver-class-name=org.h2.Driver --spring.datasource.username=sa --spring.datasource.password= --spring.jpa.hibernate.ddl-auto=none --spring.sql.init.mode=always --spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
+mvn spring-boot:run
 ```
 
 Schema is loaded from:
 - `src/main/resources/schema.sql`
+
+Optional local datasource overrides:
+
+```bash
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=shareit
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+```
+
+### Option C: Run the demo data profile
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=demo
+```
+
+## Render Deployment
+
+- `Dockerfile` builds and runs the app with the `prod` profile
+- `render.yaml` configures a Docker web service and health check
+- Set `DATABASE_URL` in Render to the PostgreSQL internal connection string
+- Set `APP_SECURITY_JWT_SECRET` in Render to a long random HS256 secret
+- Set `APP_SECURITY_JWT_EXPIRATION` in Render to a Spring `Duration` value such as `24h`
+- The `prod` profile never runs `schema.sql`; provision the production schema separately
+- Deployed API base URL: `https://shareit-jd5v.onrender.com`
 
 ## Expected Demo Output
 
@@ -129,9 +150,13 @@ Swagger support is enabled via:
   - `@Parameter` for path/header/query/body params
   - `@ApiResponse` for response descriptions
 
-After starting the application, open:
-- Swagger UI (all endpoints listed): `http://localhost:8080/swagger`
+Local endpoints:
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - OpenAPI JSON spec: `http://localhost:8080/v3/api-docs`
 
-If you run on a different port, replace `8080` in the URLs.
+Render deployment endpoints:
+- API base URL: `https://shareit-jd5v.onrender.com`
+- Swagger UI: `https://shareit-jd5v.onrender.com/swagger-ui/index.html`
+- OpenAPI JSON spec: `https://shareit-jd5v.onrender.com/v3/api-docs`
 
+If you run locally on a different port, replace `8080` in the local URLs.

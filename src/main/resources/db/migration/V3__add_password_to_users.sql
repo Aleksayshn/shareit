@@ -1,0 +1,9 @@
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+
+UPDATE users
+SET password = '__LEGACY_PASSWORD_RESET_REQUIRED__'
+WHERE password IS NULL OR BTRIM(password) = '';
+
+ALTER TABLE users
+    ALTER COLUMN password SET NOT NULL;
