@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@Profile("demo-data")
+@Profile("demo")
 public class DataInitializer {
     private final UserService userService;
     private final ItemService itemService;
