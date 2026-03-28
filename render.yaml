@@ -13,5 +13,9 @@ services:
         value: prod
       - key: DATABASE_URL
         sync: false
+      - key: APP_SECURITY_JWT_SECRET
+        sync: false
+      - key: APP_SECURITY_JWT_EXPIRATION
+        sync: false
       - key: JAVA_OPTS
         value: -XX:MaxRAMPercentage=75.0

@@ -116,6 +116,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=demo
 - `Dockerfile` builds and runs the app with the `prod` profile
 - `render.yaml` configures a Docker web service and health check
 - Set `DATABASE_URL` in Render to the PostgreSQL internal connection string
+- Set `APP_SECURITY_JWT_SECRET` in Render to a long random HS256 secret
+- Set `APP_SECURITY_JWT_EXPIRATION` in Render to a Spring `Duration` value such as `24h`
 - The `prod` profile never runs `schema.sql`; provision the production schema separately
 - Deployed API base URL: `https://shareit-jd5v.onrender.com`
 
@@ -158,4 +160,3 @@ Render deployment endpoints:
 - OpenAPI JSON spec: `https://shareit-jd5v.onrender.com/v3/api-docs`
 
 If you run locally on a different port, replace `8080` in the local URLs.
-
