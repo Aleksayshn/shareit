@@ -6,6 +6,7 @@ import com.ct5121.shareit.booking.service.BookingService;
 import com.ct5121.shareit.security.ShareItUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Bookings", description = "API for working with bookings")
+@SecurityRequirement(name = "bearerAuth")
 public class BookingController {
     private final BookingService bookingService;
 

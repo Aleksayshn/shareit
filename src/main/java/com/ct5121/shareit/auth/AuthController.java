@@ -8,6 +8,8 @@ import com.ct5121.shareit.user.dto.UserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
+    @SecurityRequirements
     @Operation(summary = "Register a new user",
             responses = {
                     @ApiResponse(responseCode = "201", description = "User registered"),
@@ -41,6 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @SecurityRequirements
     @Operation(summary = "Authenticate user",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Authentication successful"),
@@ -53,6 +57,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get current authenticated user",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Current user loaded"),

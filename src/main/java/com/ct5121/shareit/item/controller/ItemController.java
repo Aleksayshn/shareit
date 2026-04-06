@@ -9,6 +9,8 @@ import com.ct5121.shareit.security.ShareItUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -37,6 +39,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Add a new item", description = "Creates a new item")
     public ResponseEntity<ItemResponseDto> addItem(
             @AuthenticationPrincipal
@@ -49,6 +52,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update an item", description = "Only owner can update item")
     public ResponseEntity<ItemResponseDto> updateItem(
             @AuthenticationPrincipal
@@ -64,6 +68,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get item by ID", description = "Returns item details by ID")
     public ResponseEntity<ItemResponseDto> getItem(
             @AuthenticationPrincipal
@@ -76,6 +81,7 @@ public class ItemController {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get user items", description = "Returns all items belonging to user")
     public ResponseEntity<List<ItemResponseDto>> getUserItems(
             @AuthenticationPrincipal
@@ -85,6 +91,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
+    @SecurityRequirements
     @Operation(summary = "Search items", description = "Searches available items by text")
     public ResponseEntity<List<ItemResponseDto>> searchItems(
             @RequestParam
@@ -102,6 +109,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Add comment", description = "Only users with completed booking can comment",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Comment added"),
