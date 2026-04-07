@@ -168,22 +168,22 @@ class SecurityIntegrationTest {
     }
 
     private String registerPayload(String email) {
-        return """
-                {
-                  "name": "Test User",
-                  "email": "%s",
-                  "password": "%s"
-                }
-                """.formatted(email, PASSWORD);
+        return (
+                "{\n"
+                        + "  \"name\": \"Test User\",\n"
+                        + "  \"email\": \"%s\",\n"
+                        + "  \"password\": \"%s\"\n"
+                        + "}\n")
+                .formatted(email, PASSWORD);
     }
 
     private String loginPayload(String email) {
-        return """
-                {
-                  "email": "%s",
-                  "password": "%s"
-                }
-                """.formatted(email, PASSWORD);
+        return (
+                "{\n"
+                        + "  \"email\": \"%s\",\n"
+                        + "  \"password\": \"%s\"\n"
+                        + "}\n")
+                .formatted(email, PASSWORD);
     }
 
     private String bearer(String token) {
